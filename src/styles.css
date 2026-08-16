@@ -1,0 +1,457 @@
+:root{
+  --bg:#0b0f14; --panel:#0f1720; --accent:#0ea5a4; --danger:#ff4d4f; --warn:#ff9f43; --ok:#21c65b; --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace;
+}
+.body{margin:0}
+.topbar{padding:12px 20px;background:#061018;font-weight:600}
+.main{display:flex;flex-direction:column;gap:12px;padding:12px}
+.upperPanel{width:100%}
+.mapPanel{position:relative;flex:1;min-height:620px;background:linear-gradient(180deg,#07101a 0%, #08121b 100%);border-radius:6px;padding:12px;z-index:9999}
+.lowerPanel{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.reportsPanel{flex:1 1 480px;min-height:220px;background:var(--panel);padding:12px;border-radius:6px;z-index:1}
+.controlPanel{flex:0 0 360px;background:var(--panel);padding:12px;border-radius:6px;z-index:1}
+
+/* Debug outline for map/heatmap when enabled via `.mapDebug` on the body */
+.mapDebug .mapPanel { box-shadow: 0 12px 40px rgba(0,0,0,0.6); outline: 2px dashed rgba(14,165,164,0.22); }
+.mapDebug .heatmapOverlayDebug { outline: 2px dashed rgba(255,199,67,0.45); }
+
+/* Dashboard three-column grid */
+.dashboardGrid{display:grid;grid-template-columns:340px 1fr 320px;gap:12px;align-items:start}
+.reportsColumn .reportsPanel{height:720px;overflow:auto;padding:12px}
+.mapColumn .mapPanel{height:720px}
+.rightColumn .controlPanel{height:720px;overflow:auto}
+.feed{max-height:calc(720px - 220px);overflow:auto}
+
+/* Side navigation placeholder (small vertical bar) */
+.sideNav{width:56px;background:transparent}
+.app{background:linear-gradient(180deg,#041017,#061018);min-height:100vh;color:#cfe9ff}
+.topToolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.toolbarLeft{display:flex;align-items:center;gap:12px}
+.modeGroup{display:flex;gap:6px}
+.modeBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 10px;border-radius:6px;color:#9fb0c4;cursor:pointer}
+.modeBtn.active{background:var(--accent);color:#001}
+.metricCards{display:flex;gap:8px;align-items:center}
+.metricCard{background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:8px;min-width:72px;text-align:center}
+.metricValue{font-weight:800;color:#cfe9ff}
+.metricLabel{font-size:12px;color:#93a3b8}
+.toolbarRight{display:flex;align-items:center;gap:10px}
+.opacityControl{font-size:12px;color:#cfe9ff;margin-right:6px}
+.exportBtn{background:var(--accent);color:#001;padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
+
+@media (max-width: 1200px) {
+  .lowerPanel { flex-direction: column; }
+  .controlPanel { flex: 0 0 auto; width: 100%; }
+  .reportsPanel { width: 100%; }
+  .filterOverlay { left: 12px; right: 12px; top: 12px; }
+}
+.mapPanel, .campusSvg{max-width:100%}
+.feed{max-height:420px;overflow:auto}
+.feedItem{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);font-family:var(--mono)}
+.feedMeta{color:var(--accent)}
+.feedAgo{font-size:12px;color:#93a3b8}
+.reportsHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.liveReportsTitle{font-weight:800;color:#cfe9ff}
+.reportTabs{display:flex;gap:8px}
+.reportList{display:flex;flex-direction:column;gap:10px;max-height:520px;overflow:auto}
+.reportCard{display:flex;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);align-items:flex-start}
+.reportIcon{width:56px;height:56px;border-radius:10px;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800}
+.reportDetails{flex:1}
+.statusBadge{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;font-weight:800;color:#ffd6d6}
+.reportActions{display:flex;align-items:flex-start}
+.kebabBtn{background:transparent;border:none;color:#93a3b8;font-size:20px;padding:6px 8px;cursor:pointer}
+
+/* status colors */
+.reportIcon.status-dead{background:linear-gradient(180deg,#3b0f0f,#4d0f0f);color:#ffd6d6}
+.reportIcon.status-weak{background:linear-gradient(180deg,#4f2b00,#5f3600);color:#ffd6d6}
+.reportIcon.status-fair{background:linear-gradient(180deg,#7a5a00,#8a6400);color:#07121a}
+.reportIcon.status-good{background:linear-gradient(180deg,#0ea5a4,#0b837f);color:#001}
+.statusBadge.status-dead{background:rgba(255,77,77,0.06);color:#ffb3b0}
+.statusBadge.status-weak{background:rgba(255,159,67,0.06);color:#ffd8b6}
+.statusBadge.status-fair{background:rgba(255,199,67,0.06);color:#fff0c2}
+.statusBadge.status-good{background:rgba(33,198,91,0.06);color:#bff7dc}
+.viewBtn{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);padding:6px 10px;border-radius:6px;color:#93c5fd}
+.viewBtn:hover{background:rgba(59,130,246,0.12)}
+.reportBtn{background:var(--accent);color:#001;border:none;padding:6px 10px;border-radius:6px}
+.createIssueBtn{background:linear-gradient(180deg,#ff8a3d,#ff7a39);color:#001;border:none;padding:8px 12px;border-radius:8px;font-weight:800}
+.createIssueBtn:hover{filter:brightness(0.95)}
+.footer{padding:10px 12px;font-size:13px;color:#9fb0c4}
+
+/* map svg overlay */
+.campusSvg{width:100%;height:580px;background:transparent}
+.buildingLabel{fill:#cfe9ff;font-size:12px}
+
+.ratingPopover{position:absolute;background:#071722;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04)}
+@media(max-width:800px){
+  .main{flex-direction:column}
+  .sidePanel{width:100%}
+  .mapPanel{min-height:420px}
+}
+
+/* foreignObject inside SVG needs specific styling */
+.ratingPopover{width:100%;color:#cfe9ff}
+.ratingPopover button{font-family:inherit;border-radius:4px}
+
+/* Heatmap color-code legend styling */
+.heatmapLegend {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(11, 15, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: var(--mono);
+  font-size: 11px;
+  z-index: 10;
+  box-sizing: border-box;
+}
+/* Attention Required panel */
+.attentionPanel {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 320px;
+  background: linear-gradient(180deg, rgba(15,18,22,0.95), rgba(8,12,16,0.9));
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 12px;
+  border-radius: 10px;
+  z-index: 60;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
+.attentionPanel h4{margin:0 0 8px 0;color:#ffc7c0}
+.attentionItem{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-top:1px solid rgba(255,255,255,0.03)}
+.attentionItem:first-of-type{border-top:none}
+.attentionItem .left{display:flex;flex-direction:column}
+.attentionBadge{width:12px;height:12px;border-radius:12px;margin-right:8px}
+.attentionButtons{display:flex;gap:8px;margin-top:8px}
+
+/* dead zone label rectangle (inside svg) */
+.deadLabel { font-family: var(--mono); }
+.legendTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #cfe9ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.legendBar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ff4d4f 0%, #ff8a3d 33%, #ffd043 66%, #21c65b 100%);
+  margin-bottom: 6px;
+  box-shadow: inset 0 -2px 6px rgba(0,0,0,0.35);
+}
+.legendLabels {
+  display: flex;
+  justify-content: space-between;
+  color: #9fb0c4;
+}
+
+/* Time filter overlay styling */
+.filterOverlay {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(11, 15, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.filterPill {
+  background: transparent;
+  border: none;
+  color: #9fb0c4;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.filterPill:hover {
+  color: #cfe9ff;
+  background: rgba(255, 255, 255, 0.03);
+}
+.filterPill.active {
+  background: var(--accent);
+  color: #001;
+  font-weight: 600;
+}
+
+/* Auth Section and Buttons */
+.authSection {
+  font-family: var(--mono);
+}
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.userIcon {
+  font-size: 14px;
+}
+.userEmail {
+  font-size: 12px;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.authBtn {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.signInBtn {
+  background: var(--accent);
+  color: #001;
+}
+.signInBtn:hover {
+  background: #0d8c8b;
+}
+.signOutBtn {
+  background: rgba(255, 77, 79, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(255, 77, 79, 0.2);
+}
+.signOutBtn:hover {
+  background: rgba(255, 77, 79, 0.25);
+}
+.seedBtn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #cfe9ff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.seedBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Auth Modal Overlay & Card */
+.authModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+.authModalCard {
+  background: #0f1720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  animation: slideUp 0.2s ease-out;
+}
+.authModalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #93a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.authModalClose:hover {
+  color: #cfe9ff;
+}
+.authModalCard h3 {
+  margin: 0 0 8px 0;
+  color: #cfe9ff;
+  font-size: 18px;
+  font-weight: 600;
+}
+.authError {
+  background: rgba(255, 77, 79, 0.1);
+  border: 1px solid rgba(255, 77, 79, 0.25);
+  color: #ff4d4f;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+.formGroup {
+  margin-bottom: 16px;
+}
+.formGroup label {
+  display: block;
+  font-size: 12px;
+  color: #93a3b8;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.formGroup input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #cfe9ff;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.authSubmitBtn {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: #001;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.authSubmitBtn:hover {
+  background: #0d8c8b;
+}
+.authSubmitBtn:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: #93a3b8;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Search Input box and dropdown */
+.searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(15, 23, 32, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #cfe9ff;
+  font-family: inherit;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(15, 23, 32, 0.95);
+  box-shadow: 0 0 8px rgba(14, 165, 164, 0.2);
+}
+.suggestionsDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #0f1720;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  margin-top: 4px;
+}
+.suggestionItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #9fb0c4;
+  transition: all 0.15s ease;
+}
+.suggestionItem:hover {
+  background: rgba(14, 165, 164, 0.15);
+  color: #cfe9ff;
+}
+
+/* Pulsing highlight for selected building */
+.pulsingBuilding {
+  animation: pulsingBorder 2s infinite ease-in-out;
+}
+@keyframes pulsingBorder {
+  0% {
+    stroke-opacity: 0.5;
+    fill-opacity: 0.1;
+  }
+  50% {
+    stroke-opacity: 1.0;
+    fill-opacity: 0.25;
+  }
+  100% {
+    stroke-opacity: 0.5;
+    fill-opacity: 0.1;
+  }
+}
+
+/* dead-zone pulse */
+.deadPulse {
+  animation: deadPulseAnim 1.6s infinite ease-in-out;
+}
+@keyframes deadPulseAnim {
+  0% { transform: scale(1); opacity: 0.95 }
+  50% { transform: scale(1.18); opacity: 0.7 }
+  100% { transform: scale(1); opacity: 0.95 }
+}
+
+/* Top toolbar and metric cards (NetSpot-inspired) */
+.topToolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;background:linear-gradient(90deg, rgba(6,16,24,0.8), rgba(8,18,28,0.6));border-radius:8px}
+.toolbarLeft{display:flex;align-items:center;gap:14px}
+.modeGroup{display:flex;gap:8px}
+.modeBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#9fb0c4;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+.modeBtn.active{background:var(--accent);color:#001;border-color:var(--accent)}
+.metricCards{display:flex;gap:10px}
+.metricCard{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);min-width:120px}
+.metricValue{font-size:18px;font-weight:800;color:#cfe9ff}
+.metricLabel{font-size:12px;color:#93a3b8}
+.toolbarRight{display:flex;align-items:center;gap:10px}
+.opacityControl{font-size:12px;color:#9fb0c4;margin-right:6px}
+.heatSlider{width:140px}
+.exportBtn,.scanBtn{background:var(--accent);color:#001;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.exportBtn{background:#0ea5a4}
+.scanBtn{background:#ff9f43}
+
+/* Mode buttons in top toolbar responsive */
+@media (max-width:900px){
+  .metricCards{display:none}
+  .heatSlider{width:90px}
+}
+
